@@ -1,39 +1,22 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-
 export default function LogicGates2D({ params }) {
-  const [result, setResult] = useState(0);
-  const [gateName, setGateName] = useState("AND");
-
-  useEffect(() => {
-    const a = params?.inputA || 0;
-    const b = params?.inputB || 0;
-    const gate = params?.gateType || 1;
-
-    if (gate === 1) {
-      setResult(a && b ? 1 : 0);
-      setGateName("AND");
-    } else if (gate === 2) {
-      setResult(a || b ? 1 : 0);
-      setGateName("OR");
-    } else {
-      setResult(a !== b ? 1 : 0);
-      setGateName("XOR");
-    }
-  }, [params]);
-
+  const result = params.inputA && params.inputB ? "ON" : "OFF";
+  
   return (
-    <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center p-4 relative select-none">
-      {/* Live Telemetry Display */}
-      <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-3 font-mono text-[11px] text-sky-400 shadow-md">
-        STATUS: {result === 1 ? '⚡ POWER FLOWING' : '🌑 NO POWER'}
+    <div className="w-full h-full flex flex-col items-center justify-center gap-8 bg-gradient-to-b from-slate-800 to-slate-900 text-white">
+      <div className="text-3xl font-black tracking-widest text-sky-400">LOGIC GATE</div>
+      
+      <div className="flex gap-6">
+        <div className={`p-8 rounded-full ${params.inputA ? 'bg-green-500 shadow-[0_0_20px_#22c55e]' : 'bg-slate-700'}`}>A</div>
+        <div className={`p-8 rounded-full ${params.inputB ? 'bg-green-500 shadow-[0_0_20px_#22c55e]' : 'bg-slate-700'}`}>B</div>
       </div>
 
-      {/* SVG Vector Drawing Workspace */}
-      <svg viewBox="0 0 400 200" className="w-full max-w-md drop-shadow-2xl">
-        {/* Dynamic Input Wires */}
-        <line x1="50" y1="60" x2="150" y2="60" stroke={params?.inputA ? "#fbbf24" : "#334155"} strokeWidth="4" />
-        <line x1="50" y1="140" x2="150" y2="140" stroke={params?.inputB ? "#fbbf24" : "#334155"} strokeWidth="4" />
+      <div className={`text-6xl font-black ${result === "ON" ? "text-yellow-400" : "text-gray-500"}`}>
+        {result}
+      </div>
+    </div>
+  );
+}
         
         {/* Dynamic Output Wire */}
         <line x1="250" y1="100" x2="320" y2="100" stroke={result ? "#fbbf24" : "#334155"} strokeWidth="4" className={result ? "animate-pulse" : ""} />
