@@ -2,38 +2,53 @@
 import React, { useState } from 'react';
 
 export default function SimulationWrapper({ config, children }) {
-  const initialParams = {};
-  config.controls.forEach(ctrl => {
-    initialParams[ctrl.id] = ctrl.default;
-  });
-
-  const [params, setParams] = useState(initialParams);
-
-  const handleSliderChange = (id, val) => {
-    setParams(prev => ({ ...prev, [id]: parseFloat(val) }));
-  };
+  const [params, setParams] = useState(config.controls.reduce((acc, c) => ({ ...acc, [c.id]: c.default }), {}));
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 p-4 max-w-[1600px] mx-auto min-h-screen bg-sky-50 font-sans">
-      
-      {/* 📘 COLUMN 1: Left Bar - Science Journal (Auto hidden on Mobile for cleaner view) */}
-      <div className="hidden lg:flex w-72 bg-white border-3 border-sky-200 rounded-3xl p-5 shadow-md flex-col gap-4">
-        <h3 className="text-lg font-extrabold text-sky-800 border-b-2 border-sky-100 pb-2 flex items-center gap-2">
-          📘 Science Journal
-        </h3>
-        <div className="text-sm text-slate-600 flex flex-col gap-3 overflow-y-auto max-h-[65vh] pr-1">
-          {config.slug === '3d-projectile' ? (
-            <>
-              <p className="bg-sky-50 p-3 rounded-xl border border-sky-100">
-                <strong>Projectile Motion</strong> tab hoti hai hai jab kisi object ko hawa mein throw kiya jaye aur us par sirf gravity chale. Iska rasta hamesha ek <strong>Parabola</strong> curve banta hai!
-              </p>
-              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 flex flex-col gap-2">
-                <h4 className="font-bold text-amber-800 text-xs uppercase tracking-wider">📐 Key Formulas</h4>
-                <div className="p-2 bg-white rounded-lg border border-amber-100 font-mono text-[11px] flex flex-col gap-2 text-slate-700">
-                  <p>H = (v₀² · sin²θ) / 2g</p>
-                  <p>R = (v₀² · sin(2θ)) / g</p>
-                  <p>T = (2v₀ · sinθ) / g</p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-sky-100 p-4 lg:p-8 font-sans">
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-6">
+        
+        {/* Left: Interactive Playground */}
+        <div className="flex-1">
+          <div className="bg-white rounded-[2rem] p-2 shadow-2xl border-4 border-white">
+            <div className="relative w-full h-[400px] lg:h-[500px] rounded-[1.5rem] overflow-hidden bg-gradient-to-tr from-sky-400 to-blue-600">
+              {React.cloneElement(children, { params })}
+            </div>
+          </div>
+          <div className="mt-4 text-center text-xs font-bold text-sky-800 opacity-60">
+            ENGINEERED BY PERVEZ KHAN AFRIDI
+          </div>
+        </div>
+
+        {/* Right: Charming Controls */}
+        <div className="w-full lg:w-80 flex flex-col gap-4">
+          <div className="bg-white p-6 rounded-[2rem] shadow-xl border border-sky-100">
+            <h2 className="text-xl font-black text-sky-900 mb-6 text-center uppercase">Control Lab</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {config.controls.map((ctrl) => (
+                <div key={ctrl.id} className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold text-sky-700">
+                    <span>{ctrl.label}</span>
+                    <span className="bg-sky-100 px-2 py-0.5 rounded-lg">{params[ctrl.id]}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={ctrl.min}
+                    max={ctrl.max}
+                    step={ctrl.step}
+                    value={params[ctrl.id]}
+                    onChange={(e) => setParams(p => ({ ...p, [ctrl.id]: parseFloat(e.target.value) }))}
+                    className="w-full h-3 rounded-full appearance-none cursor-pointer bg-sky-200 accent-orange-500"
+                  />
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
               </div>
             </>
           ) : (
