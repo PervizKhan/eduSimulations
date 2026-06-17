@@ -1,0 +1,12 @@
+{
+  "slug": "3d-projectile",
+  "title": "3D Projectile Playground 🚀",
+  "category": "Physics",
+  "isPremium": false,
+  "engineModule": "projectile3D",
+  "controls": [
+    { "id": "v0", "label": "Launch Speed", "min": 10, "max": 80, "default": 45, "step": 1, "unit": "m/s" },
+    { "id": "angle", "label": "Launch Pitch Angle", "min": 15, "max": 90, "default": 45, "step": 1, "unit": "°" },
+    { "id": "g", "label": "Planet Gravity", "min": 3, "max": 25, "default": 9.8, "step": 0.1, "unit": "m/s²" }
+  ]
+}

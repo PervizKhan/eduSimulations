@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
+  line-height: 1.6;
+}
+
+.simulation-canvas {
+  display: block;
+  background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #4ade80 100%);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.hud-panel {
+  position: absolute;
+  top-right: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  font-family: 'Courier New', monospace;
+  z-index: 10;
+}
+
+.hud-item {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+.hud-label {
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.premium-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}

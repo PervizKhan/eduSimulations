@@ -1,0 +1,47 @@
+{
+  "slug": "freefall",
+  "title": "Free Fall Simulator 📉",
+  "category": "Physics",
+  "isPremium": false,
+  "engineModule": "freefall2D",
+  "dimensions": "2D",
+  "description": "Drop objects from various heights and study acceleration due to gravity.",
+  "controls": [
+    {
+      "id": "height",
+      "label": "Drop Height",
+      "min": 10,
+      "max": 500,
+      "default": 100,
+      "step": 10,
+      "unit": "m"
+    },
+    {
+      "id": "mass",
+      "label": "Object Mass",
+      "min": 0.1,
+      "max": 10,
+      "default": 1,
+      "step": 0.5,
+      "unit": "kg"
+    },
+    {
+      "id": "g",
+      "label": "Gravity",
+      "min": 1,
+      "max": 20,
+      "default": 9.8,
+      "step": 0.1,
+      "unit": "m/s²"
+    },
+    {
+      "id": "air_resistance",
+      "label": "Air Resistance",
+      "min": 0,
+      "max": 0.5,
+      "default": 0,
+      "step": 0.05,
+      "unit": "coefficient"
+    }
+  ]
+}
