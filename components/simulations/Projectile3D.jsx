@@ -1,39 +1,45 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 export default function Projectile3D({ params }) {
   const mountRef = useRef(null);
-  const [hud, setHud] = useState({ time: 0, x: 0, y: 0, speed: 0 });
-  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Core mutable instances references
-  const stateRef = useRef({
-    frame: 0,
-    isPlaying: false,
-    params: params,
-    realPathPoints: []
-  });
-
-  const referencesRef = useRef({
-    ball: null,
-    arrow: null,
-    expectedLine: null,
-    realLine: null
-  });
-
-  // Function to calculate and render the pre-flight expected curve path
-  const updateExpectedTrajectory = (p) => {
-    const refs = referencesRef.current;
-    if (!refs.expectedLine) return;
-
-    const points = [];
-    const theta = (p.angle * Math.PI) / 180;
-    const vx = p.v0 * Math.cos(theta);
-    const vy = p.v0 * Math.sin(theta);
+  useEffect(() => {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f9ff);
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     
-    // Total analytical flight duration estimation
-    const totalFlightTime = (2 * vy) / p.g;
+    renderer.setSize(400, 400);
+    mountRef.current.appendChild(renderer.domElement);
+
+    // Cute sphere
+    const geo = new THREE.SphereGeometry(0.5, 32, 32);
+    const mat = new THREE.MeshStandardMaterial({ color: 0xff6b6b });
+    const ball = new THREE.Mesh(geo, mat);
+    scene.add(ball);
+    
+    // Light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 5, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+    camera.position.z = 10;
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      ball.position.y = Math.sin(Date.now() * 0.005) * 2; // Simple fun motion
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    return () => { mountRef.current?.removeChild(renderer.domElement); };
+  }, [params]);
+
+  return <div ref={mountRef} className="flex justify-center items-center w-full h-full" />;
+}
     const sampleSteps = 60;
 
     for (let i = 0; i <= sampleSteps; i++) {
