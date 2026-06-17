@@ -4,181 +4,174 @@ import * as THREE from 'three';
 
 export default function Projectile3D({ params }) {
   const mountRef = useRef(null);
+  const paramsRef = useRef(params); // YEH SLIDER LAG FIX KAREGA
+
+  // Sliders ki latest value ko bina engine restart kiye update karna
+  useEffect(() => {
+    paramsRef.current = params;
+  }, [params]);
 
   useEffect(() => {
     if (!mountRef.current) return;
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
 
-    // 1. SCENE & ENVIRONMENT (Gamified Cyberpunk Look)
+    // 1. SCENE SETUP
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0f172a, 0.02); // Dark neon fog
-    scene.background = new THREE.Color(0x0f172a);
+    scene.background = new THREE.Color(0x0f172a); // Cyberpunk Dark Blue
 
-    // 2. RESPONSIVE CAMERA
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(-8, 8, 25);
+    // 2. SMART CAMERA (No Dizzy Movement)
+    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+    camera.position.set(0, 10, 35);
 
-    // 3. RENDERER (Mobile Friendly & HD)
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    // 3. RENDERER
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Sharp on phones
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountRef.current.appendChild(renderer.domElement);
 
-    // 4. LIGHTING (Dramatic Game Lighting)
-    scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-    const spotLight = new THREE.SpotLight(0xffffff, 3);
-    spotLight.position.set(10, 20, 10);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
+    // 4. LIGHTS
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const dLight = new THREE.DirectionalLight(0xffffff, 1);
+    dLight.position.set(10, 20, 10);
+    scene.add(dLight);
 
     // 5. GRID & FLOOR
-    const floorGeo = new THREE.PlaneGeometry(200, 50);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 1 });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(300, 100),
+      new THREE.MeshStandardMaterial({ color: 0x020617 })
+    );
     floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(200, 100, 0x0ea5e9, 0x1e293b); // Neon Blue Grid
-    grid.position.y = 0.01;
+    const grid = new THREE.GridHelper(300, 150, 0x0ea5e9, 0x1e293b);
     scene.add(grid);
 
-    // 6. LAUNCHER CANNON
-    const cannonGroup = new THREE.Group();
-    const baseMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 1, 16), baseMat);
-    base.position.y = 0.5;
-    base.receiveShadow = true;
-    scene.add(base);
-
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 3, 16), baseMat);
-    barrel.position.y = 1.5;
-    barrel.castShadow = true;
-    cannonGroup.add(barrel);
-    scene.add(cannonGroup);
-
-    // 7. GLOWING PROJECTILE
-    const ball = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5, 32, 32),
-      new THREE.MeshStandardMaterial({
-        color: 0xf97316,
-        emissive: 0xea580c,
-        emissiveIntensity: 0.8,
-        metalness: 0.3
-      })
+    // 6. CANNON & TARGET
+    const cannon = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.5, 0.5, 4, 16),
+      new THREE.MeshStandardMaterial({ color: 0x94a3b8 })
     );
-    ball.castShadow = true;
+    cannon.position.set(0, 1, 0);
+    scene.add(cannon);
+
+    const targetRing = new THREE.Mesh(
+      new THREE.RingGeometry(1.5, 2.5, 32),
+      new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide })
+    );
+    targetRing.rotation.x = -Math.PI / 2;
+    targetRing.position.y = 0.1;
+    scene.add(targetRing);
+
+    // 7. GLOWING BALL
+    const ball = new THREE.Mesh(
+      new THREE.SphereGeometry(0.8, 32, 32),
+      new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c })
+    );
     scene.add(ball);
 
-    const ballLight = new THREE.PointLight(0xf97316, 2, 15);
-    ball.add(ballLight);
-
-    // 8. TARGET (Bullseye Ring)
-    const targetGroup = new THREE.Group();
-    const ringGeo = new THREE.RingGeometry(1.5, 2, 32);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide });
-    const targetRing = new THREE.Mesh(ringGeo, ringMat);
-    targetRing.rotation.x = -Math.PI / 2;
-    targetGroup.add(targetRing);
-    
-    const dotMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
-    const targetDot = new THREE.Mesh(new THREE.CircleGeometry(0.4, 32), dotMat);
-    targetDot.rotation.x = -Math.PI / 2;
-    targetGroup.add(targetDot);
-    targetGroup.position.y = 0.05;
-    scene.add(targetGroup);
-
-    // 9. TRAIL EFFECT
-    const MAX_POINTS = 100;
-    const trailGeo = new THREE.BufferGeometry();
-    const positions = new Float32Array(MAX_POINTS * 3);
-    trailGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const trailMat = new THREE.LineBasicMaterial({ color: 0xfbd38d, linewidth: 2 });
-    const trail = new THREE.Line(trailGeo, trailMat);
-    scene.add(trail);
-
-    // --- PHYSICS VARIABLES ---
+    // --- GAME ENGINE LOGIC ---
     let t = 0;
-    let trailIndex = 0;
-    const v0 = params.velocity || 15;
-    const angleDeg = params.angle || 45;
-    const angle = (angleDeg * Math.PI) / 180;
+    let isWaiting = false;
+    let lastV = -1;
+    let lastAngle = -1;
     const g = 9.8;
+    let animationId;
 
-    // Apply Live Angle to Cannon
-    cannonGroup.rotation.z = -((Math.PI / 2) - angle);
-    
-    // Set Target Location (Physics Formula: R = v^2 * sin(2*theta) / g)
-    const maxRange = (v0 * v0 * Math.sin(2 * angle)) / g;
-    targetGroup.position.x = maxRange;
-
-    // Handle Mobile/Desktop Resize
-    const onResize = () => {
-      if (!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-    window.addEventListener('resize', onResize);
-
-    // --- GAME LOOP ---
-    let animationFrameId;
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
 
-      // Advance Time
-      t += 0.04;
+      // Read values directly from refs (NO LAG)
+      const v0 = paramsRef.current.velocity || 15;
+      const angleDeg = paramsRef.current.angle || 45;
+      const angleRad = (angleDeg * Math.PI) / 180;
 
-      // Projectile Math
-      const x = v0 * Math.cos(angle) * t;
-      const y = (v0 * Math.sin(angle) * t) - (0.5 * g * t * t);
-
-      if (y >= 0) {
-        ball.position.set(x, y + 0.5, 0);
-
-        // Draw Trail
-        if (trailIndex < MAX_POINTS) {
-          positions[trailIndex * 3] = x;
-          positions[trailIndex * 3 + 1] = y + 0.5;
-          positions[trailIndex * 3 + 2] = 0;
-          trailGeo.attributes.position.needsUpdate = true;
-          trailGeo.setDrawRange(0, trailIndex);
-          trailIndex++;
-        }
-      } else {
-        // Reset and loop the shot
+      // Agar user ne slider hilaya, toh ball foran wapis cannon mein!
+      if (lastV !== v0 || lastAngle !== angleDeg) {
         t = 0;
-        trailIndex = 0;
-        trailGeo.setDrawRange(0, 0);
+        isWaiting = false;
+        lastV = v0;
+        lastAngle = angleDeg;
       }
 
-      // Cinematic Camera Follow
-      const targetCamX = ball.position.x * 0.6 - 5;
-      camera.position.x += (targetCamX - camera.position.x) * 0.05;
-      camera.lookAt(ball.position.x * 0.5, 4, 0);
+      // Physics Math
+      const maxRange = (v0 * v0 * Math.sin(2 * angleRad)) / g;
+      
+      // Update Environment Dynamically
+      targetRing.position.x = maxRange;
+      cannon.rotation.z = -((Math.PI / 2) - angleRad);
+      
+      // Smart Camera: Range ke hisaab se centre mein focus karega
+      const targetCamX = maxRange / 2;
+      camera.position.x += (targetCamX - camera.position.x) * 0.1;
+      camera.lookAt(targetCamX, 5, 0);
 
-      // Pulsating Target Animation
-      const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.2;
-      targetRing.scale.set(pulse, pulse, 1);
+      // Ball Movement Logic
+      if (!isWaiting) {
+        t += 0.05; // Playback speed
+        const x = v0 * Math.cos(angleRad) * t;
+        let y = (v0 * Math.sin(angleRad) * t) - (0.5 * g * t * t);
+        y = Math.max(y, 0); // Zameen se neeche na jaye
+
+        ball.position.set(x, y + 0.8, 0);
+
+        // Update Live HUD directly in DOM (Super Fast, No React State Lag)
+        const hudX = document.getElementById('hud-x');
+        const hudY = document.getElementById('hud-y');
+        const hudT = document.getElementById('hud-t');
+        if (hudX) hudX.innerText = x.toFixed(1);
+        if (hudY) hudY.innerText = y.toFixed(1);
+        if (hudT) hudT.innerText = t.toFixed(2);
+
+        // Hit the target!
+        if (y <= 0 && t > 0.5) {
+          isWaiting = true;
+          ball.position.set(maxRange, 0.8, 0); // Lock to exact target
+          setTimeout(() => { isWaiting = false; t = 0; }, 1500); // 1.5 second wait before relaunch
+        }
+      }
+
+      // Target Ring Pulse Animation
+      targetRing.scale.setScalar(1 + Math.sin(Date.now() * 0.005) * 0.2);
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // CLEANUP MEMORY (Crucial for React + Three.js)
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', onResize);
-      if (mountRef.current) mountRef.current.innerHTML = '';
-      
-      floorGeo.dispose(); floorMat.dispose();
-      baseMat.dispose(); trailGeo.dispose(); trailMat.dispose();
-      ringGeo.dispose(); ringMat.dispose(); dotMat.dispose();
+    // Handle Resize for Mobile
+    const handleResize = () => {
+      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     };
-  }, [params]); // Engine restarts when sliders move
+    window.addEventListener('resize', handleResize);
 
-  return <div ref={mountRef} className="w-full h-full" />;
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', handleResize);
+      if (mountRef.current) mountRef.current.innerHTML = '';
+    };
+  }, []); // EMPY ARRAY = Engine only starts once!
+
+  return (
+    <div className="relative w-full h-full">
+      {/* 🎮 LIVE TELEMETRY HUD (Floating Panel) */}
+      <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-sky-500/50 shadow-[0_0_20px_rgba(14,165,233,0.3)] z-10 pointer-events-none">
+        <h3 className="text-sky-400 font-black text-xs tracking-widest mb-2 border-b border-sky-500/30 pb-1">LIVE TELEMETRY</h3>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
+          <div className="text-slate-400">DISTANCE</div>
+          <div className="text-white font-mono text-right"><span id="hud-x">0.0</span> m</div>
+          
+          <div className="text-slate-400">HEIGHT</div>
+          <div className="text-white font-mono text-right"><span id="hud-y">0.0</span> m</div>
+          
+          <div className="text-slate-400">FLIGHT TIME</div>
+          <div className="text-white font-mono text-right text-orange-400"><span id="hud-t">0.00</span> s</div>
+        </div>
+      </div>
+
+      {/* 3D Canvas Mount */}
+      <div ref={mountRef} className="w-full h-full" />
+    </div>
+  );
 }
