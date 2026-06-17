@@ -6,19 +6,18 @@ export default function Projectile3D({ params }) {
   const mountRef = useRef(null);
   const paramsRef = useRef(params);
   
-  // Game states managed inside React for the HUD buttons
   const [isFlying, setIsFlying] = useState(false);
   const isFlyingRef = useRef(false);
   const triggerResetRef = useRef(false);
 
-  // Sync sliders and controls smoothly without restarting the 3D engine
+  // Sync controls with your exact config JSON keys: v0, angle, g
   useEffect(() => {
     paramsRef.current = params;
   }, [params]);
 
   const handleLaunch = () => {
     if (isFlyingRef.current) return;
-    triggerResetRef.current = true; // Reset to start position first
+    triggerResetRef.current = true;
     setTimeout(() => {
       isFlyingRef.current = true;
       setIsFlying(true);
@@ -36,84 +35,83 @@ export default function Projectile3D({ params }) {
     const width = mountRef.current.clientWidth;
     const height = mountRef.current.clientHeight;
 
-    // 1. VIBRANT CYBERPUNK SCENE
+    // 1. CYBERPUNK ENVIRONMENT SETUP
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b0f19); // Rich deep midnight blue
-    scene.fog = new THREE.FogExp2(0x0b0f19, 0.015);
+    scene.background = new THREE.Color(0x0b0f19);
+    scene.fog = new THREE.FogExp2(0x0b0f19, 0.01);
 
-    // 2. STABLE GAME ISOMETRIC CAMERA
+    // 2. ISOMETRIC CAMERA VIEW
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(-5, 12, 30);
+    camera.position.set(-15, 20, 50);
 
-    // 3. SHARP RENDERER
+    // 3. PERFORMANCE RENDERER (Mobile Optimized)
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountRef.current.appendChild(renderer.domElement);
 
-    // 4. RICH LIGHTING
+    // 4. LIGHTS
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-    const neonLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
-    neonLight.position.set(10, 30, 10);
+    const neonLight = new THREE.DirectionalLight(0x38bdf8, 1.5);
+    neonLight.position.set(20, 40, 20);
     scene.add(neonLight);
 
-    // 5. GRID & SCI-FI FLOOR
-    const grid = new THREE.GridHelper(300, 100, 0x0ea5e9, 0x1e293b);
-    grid.position.y = 0;
+    // 5. SCI-FI SCIENTIFIC GRID
+    const grid = new THREE.GridHelper(500, 100, 0x0ea5e9, 0x1e293b);
     scene.add(grid);
 
-    // 6. CHARMING CANNON
-    const cannonGeometry = new THREE.CylinderGeometry(0.4, 0.6, 3, 16);
-    cannonGeometry.translate(0, 1.5, 0); // Rotate around base
+    // 6. ROTATING CANNON MESH
+    const cannonGeometry = new THREE.CylinderGeometry(0.5, 0.7, 4, 16);
+    cannonGeometry.translate(0, 2, 0); 
     const cannon = new THREE.Mesh(cannonGeometry, new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.2 }));
-    cannon.position.set(0, 0, 0);
     scene.add(cannon);
 
-    // 7. GLOWING TOY BALL
+    // 7. ENERGY BALL PROJECTILE
     const ball = new THREE.Mesh(
-      new THREE.SphereGeometry(0.6, 32, 32),
-      new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c, emissiveIntensity: 0.6 })
+      new THREE.SphereGeometry(0.8, 32, 32),
+      new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c, emissiveIntensity: 0.7 })
     );
-    ball.position.set(0, 0, 0);
     scene.add(ball);
 
-    // 8. LIVE PREDICTION TRAJECTORY LINE
-    const maxPoints = 150;
+    // 8. LIVE PREDICTION PATH
+    const maxPoints = 200;
     const trajectoryGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(maxPoints * 3);
     trajectoryGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const trajectoryMat = new THREE.LineDashedMaterial({ color: 0x38bdf8, dashSize: 0.5, gapSize: 0.3 });
+    const trajectoryMat = new THREE.LineBasicMaterial({ color: 0x38bdf8 });
     const trajectoryLine = new THREE.Line(trajectoryGeo, trajectoryMat);
     scene.add(trajectoryLine);
 
-    // 9. TARGET RETICLE
+    // 9. DYNAMIC TARGET POOL
     const target = new THREE.Mesh(
-      new THREE.RingGeometry(1.2, 1.8, 32),
+      new THREE.RingGeometry(2, 3, 32),
       new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide })
     );
     target.rotation.x = -Math.PI / 2;
-    target.position.y = 0.05;
+    target.position.y = 0.1;
     scene.add(target);
 
-    // --- MAIN GAME LOOP ---
+    // --- RENDER CORE GAME LOOP ---
     let t = 0;
     let animationId;
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      // Extract slider values dynamically (Supports angle, velocity, and custom gravity)
-      const v0 = paramsRef.current.velocity ?? 15;
+      // Mapping values matching your exact control json config keys
+      const v0 = paramsRef.current.v0 ?? 45;
       const angleDeg = paramsRef.current.angle ?? 45;
-      const g = paramsRef.current.gravity ?? 9.8;
+      const g = paramsRef.current.g ?? 9.8;
       const angleRad = (angleDeg * Math.PI) / 180;
 
-      // Real-time updates to Cannon and Target based on Sliders
+      // Update Launcher Pitch Angle Live
       cannon.rotation.z = -((Math.PI / 2) - angleRad);
+      
+      // Calculate Expected Safe Impact Landing Vector
       const calculatedMaxRange = (v0 * v0 * Math.sin(2 * angleRad)) / g;
       target.position.x = calculatedMaxRange;
 
-      // DRAW LIVE PREDICTION PATH (Angry Birds Style)
+      // 🎯 ANGRY BIRDS STYLE REALTIME TRACER LINE
       const pathPositions = trajectoryLine.geometry.attributes.position.array;
       let stepTime = 0;
       for (let i = 0; i < maxPoints; i++) {
@@ -125,7 +123,6 @@ export default function Projectile3D({ params }) {
         pathPositions[i * 3 + 2] = 0;
 
         if (py < 0 && stepTime > 0.1) {
-          // Fill the rest with the impact point
           for (let j = i; j < maxPoints; j++) {
             pathPositions[j * 3] = px;
             pathPositions[j * 3 + 1] = 0;
@@ -137,23 +134,22 @@ export default function Projectile3D({ params }) {
       }
       trajectoryLine.geometry.attributes.position.needsUpdate = true;
 
-      // FORCE RESET TRIGGER
+      // RESET TRIGGER
       if (triggerResetRef.current) {
         t = 0;
         ball.position.set(0, 0, 0);
         triggerResetRef.current = false;
       }
 
-      // FLYING ANIMATION LOGIC (Only runs when PLAY is active)
       if (isFlyingRef.current) {
-        t += 0.04; // Playback speed
+        t += 0.04; // Simulation speed scalar
         const currentX = v0 * Math.cos(angleRad) * t;
         let currentY = (v0 * Math.sin(angleRad) * t) - (0.5 * g * t * t);
 
         if (currentY >= 0) {
           ball.position.set(currentX, currentY, 0);
           
-          // Update HUD Numbers directly into DOM for maximum FPS performance
+          // Direct DOM injection bypasses React cycle lag completely
           const domX = document.getElementById('game-hud-x');
           const domY = document.getElementById('game-hud-y');
           const domT = document.getElementById('game-hud-t');
@@ -161,29 +157,26 @@ export default function Projectile3D({ params }) {
           if (domY) domY.innerText = currentY.toFixed(1);
           if (domT) domT.innerText = t.toFixed(2);
         } else {
-          // Ball hit the floor/target
           ball.position.set(calculatedMaxRange, 0, 0);
           isFlyingRef.current = false;
           setIsFlying(false);
         }
       } else if (!isFlyingRef.current && t === 0) {
-        // Idle state: Ball sits perfectly inside the Cannon mouth
-        ball.position.set(0, 0, 0);
+        ball.position.set(0, 0, 0); 
       }
 
-      // Smooth Camera tracking target area
+      // Smooth tracking setup centering camera viewport perfectly
       const midPointX = calculatedMaxRange / 2;
-      camera.position.x += (midPointX - 3 - camera.position.x) * 0.05;
-      camera.lookAt(midPointX, 4, 0);
+      camera.position.x += (midPointX - 5 - camera.position.x) * 0.05;
+      camera.lookAt(midPointX, 6, 0);
 
-      // Pulse effect on target ring
+      // Pulsing ring feedback loops animation
       target.scale.setScalar(1 + Math.sin(Date.now() * 0.006) * 0.15);
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // Mobile Responsive Auto-Resize
     const handleResize = () => {
       if (!mountRef.current) return;
       camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
@@ -202,11 +195,9 @@ export default function Projectile3D({ params }) {
   return (
     <div className="relative w-full h-full select-none overflow-hidden rounded-[1.5rem]">
       
-      {/* 🔮 BEAUTIFIED SCI-FI HUD OVERLAY */}
-      <div className="absolute top-4 left-4 right-4 flex flex-col sm:flex-row justify-between items-start gap-4 z-10 pointer-events-none">
-        
-        {/* Telemetry Box */}
-        <div className="bg-slate-950/80 backdrop-blur-xl px-5 py-4 rounded-2xl border border-sky-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-full sm:w-56">
+      {/* 🚀 LIVE TELEMETRY - TOP LEFT (Trajectory ke raste se door) */}
+      <div className="absolute top-4 left-4 z-10 pointer-events-none">
+        <div className="bg-slate-950/80 backdrop-blur-xl px-5 py-4 rounded-2xl border border-sky-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-48 sm:w-56">
           <div className="text-[10px] font-black text-sky-400 tracking-widest uppercase mb-2">🚀 Live Telemetry</div>
           <div className="space-y-1.5 font-mono text-xs">
             <div className="flex justify-between"><span className="text-slate-400">DISTANCE:</span><span className="text-white font-bold"><span id="game-hud-x">0.0</span> m</span></div>
@@ -214,28 +205,28 @@ export default function Projectile3D({ params }) {
             <div className="flex justify-between"><span className="text-slate-400">FLIGHT TIME:</span><span className="text-orange-400 font-bold"><span id="game-hud-t">0.00</span> s</span></div>
           </div>
         </div>
+      </div>
 
-        {/* Action Controls Container */}
-        <div className="pointer-events-auto flex gap-3 self-end sm:self-start">
-          <button
-            onClick={handleLaunch}
-            disabled={isFlying}
-            className={`px-6 py-3 rounded-xl font-black text-xs tracking-wider uppercase transition-all duration-200 shadow-lg ${
-              isFlying 
-                ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' 
-                : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:scale-105 active:scale-95 border border-emerald-400/50 shadow-green-500/20'
-            }`}
-          >
-            {isFlying ? "⚡ Flying..." : "▶️ Launch"}
-          </button>
-          
-          <button
-            onClick={handleReset}
-            className="px-5 py-3 bg-slate-900/90 text-slate-300 hover:text-white rounded-xl font-black text-xs tracking-wider uppercase transition-all duration-200 border border-slate-700 hover:bg-slate-800 active:scale-95"
-          >
-            🔄 Reset
-          </button>
-        </div>
+      {/* 🎮 BUTTONS - SHIFTED TO BOTTOM RIGHT (Zameen waale area par jahan trajectory nahi aati) */}
+      <div className="absolute bottom-4 right-4 z-10 flex gap-3 pointer-events-auto">
+        <button
+          onClick={handleLaunch}
+          disabled={isFlying}
+          className={`px-6 py-3 rounded-xl font-black text-xs tracking-wider uppercase transition-all duration-200 shadow-lg ${
+            isFlying 
+              ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' 
+              : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white hover:scale-105 active:scale-95 border border-emerald-400/50 shadow-green-500/20'
+          }`}
+        >
+          {isFlying ? "⚡ Flying..." : "▶️ Launch"}
+        </button>
+        
+        <button
+          onClick={handleReset}
+          className="px-5 py-3 bg-slate-900/90 text-slate-300 hover:text-white rounded-xl font-black text-xs tracking-wider uppercase transition-all duration-200 border border-slate-700 hover:bg-slate-800 active:scale-95"
+        >
+          🔄 Reset
+        </button>
       </div>
 
       {/* Canvas Holder */}
