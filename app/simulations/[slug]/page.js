@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import SimulationWrapper from '@/components/SimulationWrapper';
 import SimulationRenderer from '@/components/SimulationRenderer';
 
+// Registry: Add new simulations here
 const simulationsRegistry = {
   '3d-projectile': require('@/config/simulations/3d-projectile.json'),
+  'logic-gates': require('@/config/simulations/logic-gates.json'),
 };
 
 export async function generateStaticParams() {
@@ -21,7 +23,6 @@ export default async function SimulationPage({ params }) {
 
   return (
     <SimulationWrapper config={config}>
-      {/* Handing over slug matching to the client side renderer */}
       <SimulationRenderer slug={slug} />
     </SimulationWrapper>
   );

@@ -1,0 +1,12 @@
+{
+  "slug": "logic-gates",
+  "title": "Logic Gates Explorer 💻",
+  "category": "Computer Science",
+  "isPremium": false,
+  "engineModule": "logicGates2D",
+  "controls": [
+    { "id": "inputA", "label": "Input A (Off/On)", "min": 0, "max": 1, "default": 0, "step": 1, "unit": "" },
+    { "id": "inputB", "label": "Input B (Off/On)", "min": 0, "max": 1, "default": 0, "step": 1, "unit": "" },
+    { "id": "gateType", "label": "Select Gate (1:AND, 2:OR, 3:XOR)", "min": 1, "max": 3, "default": 1, "step": 1, "unit": "" }
+  ]
+}

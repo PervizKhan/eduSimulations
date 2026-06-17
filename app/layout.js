@@ -1,14 +1,14 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "EducationSimulation - Physics & Chemistry Learning",
-  description: "Interactive, gamified physics and chemistry simulations for K-12 students",
+  title: "Pervez Khan Afridi | Interactive Science Lab",
+  description: "Learn Physics and Computer Science with interactive simulations designed by Pervez Khan Afridi.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gradient-to-b from-sky via-white to-grass/20 min-h-screen">
+      <body className="bg-sky-50 min-h-screen text-slate-900">
         {children}
       </body>
     </html>
