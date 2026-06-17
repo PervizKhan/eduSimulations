@@ -10,7 +10,7 @@ export default function Projectile3D({ params }) {
   const isFlyingRef = useRef(false);
   const triggerResetRef = useRef(false);
 
-  // Sync controls with your exact config JSON keys: v0, angle, g
+  // Sync sliders dynamically
   useEffect(() => {
     paramsRef.current = params;
   }, [params]);
@@ -38,13 +38,14 @@ export default function Projectile3D({ params }) {
     // 1. CYBERPUNK ENVIRONMENT SETUP
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0b0f19);
-    scene.fog = new THREE.FogExp2(0x0b0f19, 0.01);
+    scene.fog = new THREE.FogExp2(0x0b0f19, 0.008);
 
-    // 2. ISOMETRIC CAMERA VIEW
+    // 2. CINEMATIC CAMERA SETUP
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    // Initial dynamic starting position
     camera.position.set(-15, 20, 50);
 
-    // 3. PERFORMANCE RENDERER (Mobile Optimized)
+    // 3. PERFORMANCE RENDERER
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -57,7 +58,7 @@ export default function Projectile3D({ params }) {
     scene.add(neonLight);
 
     // 5. SCI-FI SCIENTIFIC GRID
-    const grid = new THREE.GridHelper(500, 100, 0x0ea5e9, 0x1e293b);
+    const grid = new THREE.GridHelper(600, 120, 0x0ea5e9, 0x1e293b);
     scene.add(grid);
 
     // 6. ROTATING CANNON MESH
@@ -73,7 +74,7 @@ export default function Projectile3D({ params }) {
     );
     scene.add(ball);
 
-    // 8. LIVE PREDICTION PATH
+    // 8. LIVE PREDICTION PATH MATRIX (Blueprint Line)
     const maxPoints = 200;
     const trajectoryGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(maxPoints * 3);
@@ -82,7 +83,7 @@ export default function Projectile3D({ params }) {
     const trajectoryLine = new THREE.Line(trajectoryGeo, trajectoryMat);
     scene.add(trajectoryLine);
 
-    // 9. DYNAMIC TARGET POOL
+    // 9. DYNAMIC TARGET RETICLE
     const target = new THREE.Mesh(
       new THREE.RingGeometry(2, 3, 32),
       new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide })
@@ -98,7 +99,7 @@ export default function Projectile3D({ params }) {
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      // Mapping values matching your exact control json config keys
+      // Extract control keys from JSON configuration
       const v0 = paramsRef.current.v0 ?? 45;
       const angleDeg = paramsRef.current.angle ?? 45;
       const g = paramsRef.current.g ?? 9.8;
@@ -111,7 +112,7 @@ export default function Projectile3D({ params }) {
       const calculatedMaxRange = (v0 * v0 * Math.sin(2 * angleRad)) / g;
       target.position.x = calculatedMaxRange;
 
-      // 🎯 ANGRY BIRDS STYLE REALTIME TRACER LINE
+      // REALTIME TRACER LINE
       const pathPositions = trajectoryLine.geometry.attributes.position.array;
       let stepTime = 0;
       for (let i = 0; i < maxPoints; i++) {
@@ -141,15 +142,16 @@ export default function Projectile3D({ params }) {
         triggerResetRef.current = false;
       }
 
+      // PHYSICS FLIGHT LOGIC
       if (isFlyingRef.current) {
-        t += 0.04; // Simulation speed scalar
+        t += 0.04; 
         const currentX = v0 * Math.cos(angleRad) * t;
         let currentY = (v0 * Math.sin(angleRad) * t) - (0.5 * g * t * t);
 
         if (currentY >= 0) {
           ball.position.set(currentX, currentY, 0);
           
-          // Direct DOM injection bypasses React cycle lag completely
+          // Direct DOM injection updates HUD bypasses React delay
           const domX = document.getElementById('game-hud-x');
           const domY = document.getElementById('game-hud-y');
           const domT = document.getElementById('game-hud-t');
@@ -161,16 +163,48 @@ export default function Projectile3D({ params }) {
           isFlyingRef.current = false;
           setIsFlying(false);
         }
-      } else if (!isFlyingRef.current && t === 0) {
-        ball.position.set(0, 0, 0); 
+
+        // 🎥 GLORIOUS DYNAMIC TRACKING CAMERA MOVEMENT (Flight Mode)
+        // Camera sweeps in a gorgeous rotational orbit ahead and around the moving ball
+        const rotationSweep = t * 0.15; 
+        const radius = 35 - Math.min(t * 1.5, 15); // Zooms in slightly as it tracks
+        
+        const targetCamX = ball.position.x - radius * Math.cos(rotationSweep);
+        const targetCamY = ball.position.y + 12 + Math.sin(t * 0.3) * 3;
+        const targetCamZ = radius * Math.sin(rotationSweep) + 20;
+
+        // Ultra smooth tracking interpolation
+        camera.position.x += (targetCamX - camera.position.x) * 0.08;
+        camera.position.y += (targetCamY - camera.position.y) * 0.08;
+        camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+        
+        // Lock gaze directly onto the flying projectile core
+        camera.lookAt(ball.position.x, ball.position.y, ball.position.z);
+
+      } else {
+        // Idle state layout
+        if (t === 0) {
+          ball.position.set(0, 0, 0);
+        }
+
+        // 🎥 GLORIOUS PANORAMIC ORBIT MOVEMENT (Idle Mode)
+        // Camera rotates slowly around the playground landscape for high visual fidelity
+        const idlePulse = Date.now() * 0.0003;
+        const midPointX = calculatedMaxRange / 2;
+        
+        const targetCamX = midPointX - 35 * Math.cos(idlePulse);
+        const targetCamY = 18 + Math.sin(idlePulse) * 2;
+        const targetCamZ = 50 + Math.sin(idlePulse) * 6;
+
+        camera.position.x += (targetCamX - camera.position.x) * 0.04;
+        camera.position.y += (targetCamY - camera.position.y) * 0.04;
+        camera.position.z += (targetCamZ - camera.position.z) * 0.04;
+
+        // Keep viewport centered on the upcoming flight path zone
+        camera.lookAt(midPointX, 5, 0);
       }
 
-      // Smooth tracking setup centering camera viewport perfectly
-      const midPointX = calculatedMaxRange / 2;
-      camera.position.x += (midPointX - 5 - camera.position.x) * 0.05;
-      camera.lookAt(midPointX, 6, 0);
-
-      // Pulsing ring feedback loops animation
+      // Target Ring Pulse feedback
       target.scale.setScalar(1 + Math.sin(Date.now() * 0.006) * 0.15);
 
       renderer.render(scene, camera);
@@ -195,7 +229,7 @@ export default function Projectile3D({ params }) {
   return (
     <div className="relative w-full h-full select-none overflow-hidden rounded-[1.5rem]">
       
-      {/* 🚀 LIVE TELEMETRY - TOP LEFT (Trajectory ke raste se door) */}
+      {/* 🚀 LIVE TELEMETRY - TOP LEFT */}
       <div className="absolute top-4 left-4 z-10 pointer-events-none">
         <div className="bg-slate-950/80 backdrop-blur-xl px-5 py-4 rounded-2xl border border-sky-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] w-48 sm:w-56">
           <div className="text-[10px] font-black text-sky-400 tracking-widest uppercase mb-2">🚀 Live Telemetry</div>
@@ -207,7 +241,7 @@ export default function Projectile3D({ params }) {
         </div>
       </div>
 
-      {/* 🎮 BUTTONS - SHIFTED TO BOTTOM RIGHT (Zameen waale area par jahan trajectory nahi aati) */}
+      {/* 🎮 BUTTONS - BOTTOM RIGHT (Trajectory ke raste se mukammal bahir) */}
       <div className="absolute bottom-4 right-4 z-10 flex gap-3 pointer-events-auto">
         <button
           onClick={handleLaunch}
@@ -229,7 +263,6 @@ export default function Projectile3D({ params }) {
         </button>
       </div>
 
-      {/* Canvas Holder */}
       <div ref={mountRef} className="w-full h-full" />
     </div>
   );
