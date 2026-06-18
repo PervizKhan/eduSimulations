@@ -16,14 +16,18 @@ async function getSimulationConfig(slug) {
 
 // ===== GENERATE STATIC PATHS =====
 export async function generateStaticParams() {
-  const configDir = path.join(process.cwd(), 'config/simulations');
-  const files = fs.readdirSync(configDir);
-  
-  return files
-    .filter(file => file.endsWith('.json'))
-    .map(file => ({
-      slug: file.replace('.json', '')
-    }));
+  try {
+    const configDir = path.join(process.cwd(), 'config/simulations');
+    const files = fs.readdirSync(configDir);
+    
+    return files
+      .filter(file => file.endsWith('.json'))
+      .map(file => ({
+        slug: file.replace('.json', '')
+      }));
+  } catch (error) {
+    return [];
+  }
 }
 
 // ===== PAGE COMPONENT =====
@@ -36,7 +40,9 @@ export default async function SimulationPage({ params }) {
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-red-400">❌ Simulation Not Found</h1>
-          <p className="text-slate-400 mt-2">The simulation "{slug}" does not exist.</p>
+          <p className="text-slate-400 mt-2">
+            The simulation &quot;{slug}&quot; does not exist.
+          </p>
         </div>
       </div>
     );

@@ -121,21 +121,21 @@ export default function Projectile3D({ params }) {
 
   // ===== SYNC PARAMS =====
   useEffect(() => {
-    simState.current.params = safeParams;
-    updatePredictedPath(safeParams);
-    
-    if (!simState.current.isPlaying && arrowRef.current && ballRef.current) {
-      const theta = (safeParams.angle * Math.PI) / 180;
-      const dir = new THREE.Vector3(Math.cos(theta), Math.sin(theta), 0).normalize();
-      arrowRef.current.setDirection(dir);
-      ballRef.current.position.set(0, 0.8, 0);
-      arrowRef.current.position.set(0, 0.8, 0);
-    }
-    
-    if (!simState.current.isPlaying) {
-      updateTelemetry({ time: 0, range: 0, height: 0, speed: 0, maxHeight: 0, totalRange: 0, flightTime: 0 });
-    }
-  }, [safeParams]);
+  simState.current.params = safeParams;
+  updatePredictedPath(safeParams);
+  
+  if (!simState.current.isPlaying && arrowRef.current && ballRef.current) {
+    const theta = (safeParams.angle * Math.PI) / 180;
+    const dir = new THREE.Vector3(Math.cos(theta), Math.sin(theta), 0).normalize();
+    arrowRef.current.setDirection(dir);
+    ballRef.current.position.set(0, 0.8, 0);
+    arrowRef.current.position.set(0, 0.8, 0);
+  }
+  
+  if (!simState.current.isPlaying) {
+    updateTelemetry({ time: 0, range: 0, height: 0, speed: 0, maxHeight: 0, totalRange: 0, flightTime: 0 });
+  }
+}, [safeParams]); // ← This is correct, no change needed
 
   // ===== THREE.JS SETUP =====
   useEffect(() => {
