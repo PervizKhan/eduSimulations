@@ -1,7 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+  experimental: {
+    // Allow JSON imports from config folder
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.json$/,
+      type: 'json',
+    });
+    return config;
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

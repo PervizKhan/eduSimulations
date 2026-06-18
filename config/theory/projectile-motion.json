@@ -1,0 +1,84 @@
+{
+  "title": "Projectile Motion — Physics Theory",
+  "gradeLevel": "Class 9-12",
+  "sections": [
+    {
+      "id": "definition",
+      "title": "📖 What is Projectile Motion?",
+      "content": "Projectile motion is the motion of an object thrown into the air, subject to only the acceleration of gravity. The object is called a **projectile**, and its path is called its **trajectory**.",
+      "keyPoints": [
+        "No air resistance is assumed (ideal case)",
+        "Horizontal motion has constant velocity",
+        "Vertical motion has constant acceleration (gravity)"
+      ]
+    },
+    {
+      "id": "equations",
+      "title": "📐 Key Equations",
+      "content": "For a projectile launched with initial velocity v₀ at angle θ:",
+      "formulas": [
+        {
+          "name": "Horizontal Position",
+          "formula": "x = v₀ · t · cos(θ)",
+          "description": "Horizontal distance at time t"
+        },
+        {
+          "name": "Vertical Position",
+          "formula": "y = v₀ · t · sin(θ) - ½ · g · t²",
+          "description": "Vertical height at time t"
+        },
+        {
+          "name": "Time of Flight",
+          "formula": "T = 2 · v₀ · sin(θ) / g",
+          "description": "Total time in air"
+        },
+        {
+          "name": "Maximum Height",
+          "formula": "H = (v₀² · sin²(θ)) / (2g)",
+          "description": "Highest point reached"
+        },
+        {
+          "name": "Range",
+          "formula": "R = v₀² · sin(2θ) / g",
+          "description": "Total horizontal distance"
+        }
+      ]
+    },
+    {
+      "id": "concepts",
+      "title": "💡 Important Physics Concepts",
+      "points": [
+        "Horizontal velocity (vₓ) remains **constant** throughout the flight",
+        "Vertical velocity (vᵧ) changes at rate **g** (acceleration due to gravity)",
+        "At maximum height, vertical velocity = 0",
+        "Range is **maximum at 45°** (ideal case)",
+        "Trajectory is a **parabola**",
+        "Flight time depends only on **vertical component** of velocity"
+      ]
+    },
+    {
+      "id": "realWorld",
+      "title": "🌍 Real-World Applications",
+      "examples": [
+        "🏏 Cricket: When a batsman hits a six",
+        "⚽ Football: Goal kick trajectory",
+        "🏹 Archery: Arrow path",
+        "🏃 Javelin throw",
+        "🚀 Artillery: Cannonball trajectory",
+        "🏀 Basketball: Free throw arc"
+      ]
+    },
+    {
+      "id": "derivations",
+      "title": "📝 Derivations (Class 11-12)",
+      "content": "Understanding where the formulas come from:",
+      "steps": [
+        "From equations of motion: v = u + at, s = ut + ½at²",
+        "Separate horizontal and vertical components",
+        "At maximum height: vᵧ = 0 → t = v₀·sin(θ)/g",
+        "Total flight time = 2 × time to max height",
+        "Range = vₓ × total time = v₀·cos(θ) × 2v₀·sin(θ)/g = v₀²·sin(2θ)/g"
+      ]
+    }
+  ]
+}

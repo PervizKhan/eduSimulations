@@ -1,26 +1,47 @@
-import React from 'react';
-import { notFound } from 'next/navigation';
 import SimulationWrapper from '@/components/SimulationWrapper';
 import SimulationRenderer from '@/components/SimulationRenderer';
+import fs from 'fs';
+import path from 'path';
 
-// Registry: Add new simulations here
-const simulationsRegistry = {
-  '3d-projectile': require('@/config/simulations/3d-projectile.json'),
-  'logic-gates': require('@/config/simulations/logic-gates.json'),
-};
-
-export async function generateStaticParams() {
-  return Object.keys(simulationsRegistry).map((slug) => ({ slug }));
+// ===== GET SIMULATION CONFIG =====
+async function getSimulationConfig(slug) {
+  try {
+    const configPath = path.join(process.cwd(), 'config/simulations', `${slug}.json`);
+    const fileContents = fs.readFileSync(configPath, 'utf8');
+    return JSON.parse(fileContents);
+  } catch (error) {
+    return null;
+  }
 }
 
+// ===== GENERATE STATIC PATHS =====
+export async function generateStaticParams() {
+  const configDir = path.join(process.cwd(), 'config/simulations');
+  const files = fs.readdirSync(configDir);
+  
+  return files
+    .filter(file => file.endsWith('.json'))
+    .map(file => ({
+      slug: file.replace('.json', '')
+    }));
+}
+
+// ===== PAGE COMPONENT =====
 export default async function SimulationPage({ params }) {
   const { slug } = await params;
-  const config = simulationsRegistry[slug];
-
+  const config = await getSimulationConfig(slug);
+  
   if (!config) {
-    notFound();
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-red-400">❌ Simulation Not Found</h1>
+          <p className="text-slate-400 mt-2">The simulation "{slug}" does not exist.</p>
+        </div>
+      </div>
+    );
   }
-
+  
   return (
     <SimulationWrapper config={config}>
       <SimulationRenderer slug={slug} />
