@@ -1,6 +1,10 @@
 "use client";
 import React, { useState, useMemo } from 'react';
 
+import projectileTheory from '@/config/theory/projectile-motion.json';
+import cartesianTheory from '@/config/theory/cartesian-coordinates.json';
+
+
 export default function TheoryPanel({ params, theoryConfig }) {
   const [showDerivations, setShowDerivations] = useState(false);
   const [activeSection, setActiveSection] = useState('definition');

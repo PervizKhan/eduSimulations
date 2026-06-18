@@ -1,0 +1,76 @@
+{
+  "title": "Cartesian Coordinate System — Theory",
+  "gradeLevel": "Class 9-12",
+  "sections": [
+    {
+      "id": "definition",
+      "title": "📖 What is the Cartesian Coordinate System?",
+      "content": "The Cartesian coordinate system is a way to describe the position of a point in a plane using two numbers: (x, y).\n\nIt was invented by the French mathematician René Descartes (1596-1650).",
+      "keyPoints": [
+        "<strong>X-axis:</strong> The horizontal number line",
+        "<strong>Y-axis:</strong> The vertical number line",
+        "<strong>Origin:</strong> The point (0, 0) where axes intersect",
+        "<strong>Coordinates:</strong> (x, y) where x is horizontal distance and y is vertical distance"
+      ]
+    },
+    {
+      "id": "quadrants",
+      "title": "🔲 The Four Quadrants",
+      "content": "The axes divide the plane into four regions called quadrants:",
+      "points": [
+        "<strong>Quadrant I:</strong> (+, +) → Both x and y are positive",
+        "<strong>Quadrant II:</strong> (-, +) → x is negative, y is positive",
+        "<strong>Quadrant III:</strong> (-, -) → Both x and y are negative",
+        "<strong>Quadrant IV:</strong> (+, -) → x is positive, y is negative"
+      ]
+    },
+    {
+      "id": "distance",
+      "title": "📐 Distance Between Two Points",
+      "content": "The distance between two points (x₁, y₁) and (x₂, y₂) is calculated using the distance formula:",
+      "formulas": [
+        {
+          "name": "Distance Formula",
+          "formula": "d = √((x₂ - x₁)² + (y₂ - y₁)²)",
+          "description": "This is derived from the Pythagorean theorem"
+        }
+      ]
+    },
+    {
+      "id": "midpoint",
+      "title": "📍 Midpoint Formula",
+      "content": "The midpoint of a line segment connecting two points is the average of their coordinates:",
+      "formulas": [
+        {
+          "name": "Midpoint Formula",
+          "formula": "M = ((x₁ + x₂)/2, (y₁ + y₂)/2)",
+          "description": "The point exactly halfway between two points"
+        }
+      ]
+    },
+    {
+      "id": "slope",
+      "title": "📈 Slope of a Line",
+      "content": "The slope describes the steepness and direction of a line:",
+      "formulas": [
+        {
+          "name": "Slope Formula",
+          "formula": "m = (y₂ - y₁) / (x₂ - x₁)",
+          "description": "Rise over run — vertical change divided by horizontal change"
+        }
+      ]
+    },
+    {
+      "id": "realWorld",
+      "title": "🌍 Real-World Applications",
+      "examples": [
+        "🗺️ GPS navigation systems",
+        "🗺️ Google Maps and location services",
+        "🎮 Video game development (character positions)",
+        "📊 Data visualization and charts",
+        "🏗️ Architecture and engineering blueprints",
+        "🛰️ Satellite positioning systems"
+      ]
+    }
+  ]
+}

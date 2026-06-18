@@ -1,0 +1,118 @@
+{
+  "title": "Cartesian Coordinate System",
+  "slug": "cartesian-coordinates",
+  "description": "Learn how to plot points, understand quadrants, and explore the coordinate plane.",
+  "controls": [
+    {
+      "id": "pointX",
+      "label": "Point X",
+      "min": -10,
+      "max": 10,
+      "step": 0.5,
+      "default": 3,
+      "unit": ""
+    },
+    {
+      "id": "pointY",
+      "label": "Point Y",
+      "min": -10,
+      "max": 10,
+      "step": 0.5,
+      "default": 4,
+      "unit": ""
+    },
+    {
+      "id": "point2X",
+      "label": "Point 2 X",
+      "min": -10,
+      "max": 10,
+      "step": 0.5,
+      "default": -2,
+      "unit": ""
+    },
+    {
+      "id": "point2Y",
+      "label": "Point 2 Y",
+      "min": -10,
+      "max": 10,
+      "step": 0.5,
+      "default": -3,
+      "unit": ""
+    },
+    {
+      "id": "showGrid",
+      "label": "Show Grid",
+      "min": 0,
+      "max": 1,
+      "step": 1,
+      "default": 1,
+      "unit": ""
+    },
+    {
+      "id": "showLabels",
+      "label": "Show Labels",
+      "min": 0,
+      "max": 1,
+      "step": 1,
+      "default": 1,
+      "unit": ""
+    }
+  ],
+  "telemetry": [
+    { "id": "point1", "label": "Point 1", "target": "telemetry-point1" },
+    { "id": "point2", "label": "Point 2", "target": "telemetry-point2" },
+    { "id": "distance", "label": "Distance", "target": "telemetry-distance" },
+    { "id": "midpoint", "label": "Midpoint", "target": "telemetry-midpoint" },
+    { "id": "quadrant1", "label": "Quadrant", "target": "telemetry-quadrant1" },
+    { "id": "quadrant2", "label": "Quadrant", "target": "telemetry-quadrant2" },
+    { "id": "slope", "label": "Slope", "target": "telemetry-slope" }
+  ],
+  "buttons": [
+    {
+      "id": "showDistance",
+      "label": "Show Distance",
+      "action": "toggleDistance",
+      "toggleable": true,
+      "default": true
+    },
+    {
+      "id": "showMidpoint",
+      "label": "Show Midpoint",
+      "action": "toggleMidpoint",
+      "toggleable": true,
+      "default": true
+    },
+    {
+      "id": "showLine",
+      "label": "Show Line",
+      "action": "toggleLine",
+      "toggleable": true,
+      "default": true
+    },
+    {
+      "id": "showQuadrants",
+      "label": "Show Quadrants",
+      "action": "toggleQuadrants",
+      "toggleable": true,
+      "default": true
+    }
+  ],
+  "camera": {
+    "idle": {
+      "distance": 30,
+      "height": 25,
+      "rotationSpeed": 0.2
+    },
+    "active": {
+      "distance": 20,
+      "height": 15,
+      "chaseSpeed": 0.08
+    }
+  },
+  "scene": {
+    "gridSize": 20,
+    "groundColor": "0x0a0e1a",
+    "gridColor1": "0x4a6fa5",
+    "gridColor2": "0x2a4a7a"
+  }
+}
